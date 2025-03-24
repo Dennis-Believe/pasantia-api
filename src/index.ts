@@ -1,26 +1,28 @@
 import { Hono } from 'hono'
-// Make sure to install the 'postgres' package
-import { drizzle } from 'drizzle-orm/postgres-js';
-import postgres from 'postgres';
-import * as schema from './db/schema'
+import { cors } from 'hono/cors'
+import { prettyJSON } from 'hono/pretty-json'
+import { logger } from 'hono/logger'
+import { serve } from '@hono/node-server'
+import { env } from './config/env'
+import { db } from './db/db.client'
+const app = new Hono()
 
-
-
-export type Env = {
-  Bindings: {
-    DATABASE_URL: string
-  }
-}
-
-const app = new Hono<Env>()
+app.use('*', cors())
+app.use('*', prettyJSON())
+app.use('*', logger())
 
 app.get('/', async (c) => {
-  const queryClient = postgres(c.env.DATABASE_URL);
-  const db = drizzle({ client: queryClient, schema });
+  const result = await db.query.users.findMany()
+  console.log(result)
+  return c.json({ message: 'Hello World', result })
+})
 
-  const result = await db.query.users.findMany();
-  console.log('DATABASE_URL', result);
-  return c.text('Hello Hono!: ' + c.env.DATABASE_URL)
+const port = env.port
+console.log(`Servidor iniciado en http://localhost:${port}`)
+
+serve({
+  fetch: app.fetch,
+  port: Number(port),
 })
 
 export default app

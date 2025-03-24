@@ -1,12 +1,19 @@
 {
   "name": "hono-cloud",
   "scripts": {
-    "dev": "wrangler dev",
-    "deploy": "wrangler deploy --minify",
-    "db:generate": "bun drizzle-kit generate",
-    "studio": "bun drizzle-kit studio"
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "start:prod": "pm2 start dist/index.js --name 'result-api'",
+    "db:generate": "drizzle-kit generate:pg",
+    "db:push": "drizzle-kit push:pg",
+    "migrate": "tsx src/db/migrate.ts",
+    "studio": "drizzle-kit studio"
   },
   "dependencies": {
+    "@esbuild/linux-x64": "^0.25.1",
+    "@hono/node-server": "^1.14.0",
+    "dotenv": "^16.4.7",
     "drizzle-orm": "^0.41.0",
     "hono": "^4.7.5",
     "hono-cloud": "file:",
