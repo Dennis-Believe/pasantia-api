@@ -5,7 +5,8 @@
     "build": "tsc && tsc-alias"
   },
   "dependencies": {
-    "hono": "^4.7.5"
+    "hono": "^4.7.5",
+    "pasantia-api": "file:"
   },
   "devDependencies": {
     "@types/bun": "latest",

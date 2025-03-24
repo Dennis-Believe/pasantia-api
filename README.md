@@ -8,4 +8,6 @@ To run:
 bun run dev
 ```
 
+use crypto and jwt for the login
+
 open http://localhost:3000
