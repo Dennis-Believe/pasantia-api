@@ -1,5 +1,10 @@
 To install dependencies:
 ```sh
+npm i -g bun
+```
+
+To install dependencies:
+```sh
 bun install
 ```
 
