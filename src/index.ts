@@ -10,7 +10,7 @@ const app = new Hono<Env>()
 
 app.get('/', (c) => {
   console.log('DATABASE_URL', c.env.DATABASE_URL)
-  return c.text('Hello Hono!')
+  return c.text('Hello Hono!: ' + c.env.DATABASE_URL)
 })
 
 export default app
