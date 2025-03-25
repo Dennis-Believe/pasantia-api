@@ -1,16 +1,14 @@
-import { date } from "drizzle-orm/mysql-core";
-import { integer, pgTable, varchar } from "drizzle-orm/pg-core";
+import { pgTable, uuid, varchar, timestamp, date } from 'drizzle-orm/pg-core'
+
 
 export const users = pgTable('users', {
-    id: integer(),
-    firstName: varchar('first_name')
-  })
-/*export const users = pgTable('users', {
-  id: integer().primaryKey(),
-  firstName: varchar('fist_name'),
-  lastName:varchar('last_name'),
-  email:varchar('email'),
-  password:varchar('password'),
-  createdAt:date(),
-  updatedAt:date()
-})*/
+  id: uuid('id').defaultRandom().primaryKey(),
+  firstName: varchar('firstName', { length: 255 }).notNull(),
+  lastName: varchar('lastName', { length: 255 }),
+  email: varchar('email', { length: 255 }).notNull().unique(),
+  password: varchar('password', { length: 255 }).notNull(),
+  birthDate: date('birthDate').notNull(),
+  createdAt: timestamp('createdAt').defaultNow().notNull(),
+  updatedAt: timestamp('updatedAt').defaultNow().notNull(),
+})
+

@@ -1,5 +1,4 @@
 import { Hono } from 'hono'
-// Make sure to install the 'postgres' package
 import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import * as schema from './db/schema'
