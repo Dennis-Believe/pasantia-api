@@ -1,4 +1,10 @@
 import { Hono } from 'hono'
+// Make sure to install the 'postgres' package
+import { drizzle } from 'drizzle-orm/postgres-js';
+import postgres from 'postgres';
+import * as schema from './db/schema'
+
+
 
 export type Env = {
   Bindings: {
@@ -8,8 +14,12 @@ export type Env = {
 
 const app = new Hono<Env>()
 
-app.get('/', (c) => {
-  console.log('DATABASE_URL', c.env.DATABASE_URL)
+app.get('/', async (c) => {
+  const queryClient = postgres(c.env.DATABASE_URL);
+  const db = drizzle({ client: queryClient, schema });
+
+  const result = await db.query.users.findMany();
+  console.log('DATABASE_URL', result);
   return c.text('Hello Hono!: ' + c.env.DATABASE_URL)
 })
 

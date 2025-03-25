@@ -2,13 +2,20 @@
   "name": "hono-cloud",
   "scripts": {
     "dev": "wrangler dev",
-    "deploy": "wrangler deploy --minify"
+    "deploy": "wrangler deploy --minify",
+    "db:generate": "bun drizzle-kit generate",
+    "studio": "bun drizzle-kit studio"
   },
   "dependencies": {
-    "hono": "^4.7.5"
+    "drizzle-orm": "^0.41.0",
+    "hono": "^4.7.5",
+    "hono-cloud": "file:",
+    "postgres": "^3.4.5"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250214.0",
+    "drizzle-kit": "^0.30.5",
+    "tsx": "^4.19.3",
     "wrangler": "^3.109.2"
   }
 }
