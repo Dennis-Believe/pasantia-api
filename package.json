@@ -10,7 +10,8 @@
     "drizzle-orm": "^0.41.0",
     "hono": "^4.7.5",
     "hono-cloud": "file:",
-    "postgres": "^3.4.5"
+    "postgres": "^3.4.5",
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250214.0",
