@@ -8,6 +8,13 @@
       "when": 1742942766203,
       "tag": "0000_unique_mad_thinker",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1742948436087,
+      "tag": "0001_previous_franklin_storm",
+      "breakpoints": true
     }
   ]
 }
