@@ -15,19 +15,20 @@ export class AuthController {
     try {
       const body = await c.req.json();
       const parsed = loginSchema.safeParse(body);
+     
       if (!parsed.success) {
         return c.json({ errors: parsed.error.formErrors.fieldErrors }, 400);
       }
-      const { email, password, tokenOtb } = parsed.data;
+      const { email, password } = parsed.data;
+      
 
-      const { user, otbRecord } = await this.authService.validateCredentials(email, password, tokenOtb);
+      const { user } = await this.authService.validateCredentials(email, password);
+     
 
       const token = await generateJWT(user.id);
 
       setCookie(c, 'token', token, { httpOnly: true, secure: true, sameSite: "Strict" });
 
-      await this.authService.deleteOtbById(otbRecord.id);
-      await this.authService.updateUserState(user.id, true);
 
       return c.json({ message: 'Login successful', token: `Bearer ${token}` });
     } catch (error: any) {
@@ -42,8 +43,6 @@ export class AuthController {
         return c.json({ error: 'Not logged in' }, 401);
       }
       const decoded: any = await verifyJwtToken(token);
-
-      await this.authService.updateUserState(decoded.userId, false);
       deleteCookie(c, 'token');
       return c.json({ message: 'Logout successful' });
     } catch (error: any) {
