@@ -5,7 +5,10 @@ import { logger } from 'hono/logger'
 import { serve } from '@hono/node-server'
 import { env } from './config/env'
 import db from './db/db.client'
+import { userRoutes } from './routes/userRoutes'
+import { authRoutes } from './routes/authRoutes'
 const app = new Hono()
+
 
 app.use('*', cors())
 app.use('*', prettyJSON())
@@ -16,13 +19,16 @@ app.get('/', async (c) => {
   console.log(result)
   return c.json({ message: 'Hello World' })
 })
+app.route('/api/user', userRoutes)
+app.route('/api/auth', authRoutes)
 
 const port = env.port
 console.log(`Servidor iniciado en http://localhost:${port}`)
 
 serve({
   fetch: app.fetch,
-  port: Number(port),
+  port: Number(port)||8787,
 })
+
 
 export default app
