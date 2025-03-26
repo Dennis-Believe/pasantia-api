@@ -3,8 +3,8 @@ import db from '@/db/db.client';
 import { otb } from '@/db/schema/otb';
 import { users } from '@/db/schema/users';
 import crypto from 'crypto';
-import { transporter } from '@/utils/userUtils';
 import { env } from '../../config/env';
+import { transporter } from '../auth/utils/authUtils';
 
 export class OTBService {
   private dbClient;

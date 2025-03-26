@@ -1,8 +1,8 @@
 import { eq } from 'drizzle-orm';
 import db from '@/db/db.client';
 import { otb } from '@/db/schema/otb';
-import { decryptPassword } from '@/utils/userUtils';
 import { UserService } from '@/modules/user/userService';
+import { decryptPassword } from './utils/authUtils';
 
 export class AuthService {
   private userService: UserService;
