@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
-import db from '@/db/db.client';
-import { otb } from '@/db/schema/otb';
-import { UserService } from '@/modules/user/userService';
+import db from '../../db/db.client';
+import { otb } from '../../db/schema/otb';
+import { UserService } from '../../modules/user/userService';
 import { decryptPassword } from './utils/authUtils';
 
 export class AuthService {
@@ -11,33 +11,25 @@ export class AuthService {
     this.userService = userService;
   }
 
-  async findOtbByUserId(userId: string) {
-    return await db.query.otb.findFirst({
-      where: eq(otb.userId, userId),
-    });
-  }
-
-  async deleteOtbById(otbId: string) {
-    return await db.delete(otb).where(eq(otb.id,otbId));
-  }
-
-  async validateCredentials(email: string, password: string, tokenOtb: number) {
+  
+  async validateCredentials(email: string, password: string) {
     const user = await this.userService.findUserByEmail(email);
-    if (!user || user.state) {
-      throw new Error('Invalid credentials');
+    if (!user ) {
+      throw new Error('Invalid credentials ');
+    }
+    if( !user.state)
+    {
+      throw new Error('User Disabled');
     }
 
-    const otbRecord = await this.findOtbByUserId(user.id);
-    if (!otbRecord || tokenOtb !== otbRecord.token) {
-      throw new Error('Error with OTB');
-    }
+    
 
     const decryptedPassword = await decryptPassword(user.password);
     if (password !== decryptedPassword) {
       throw new Error('Invalid credentials');
     }
 
-    return { user, otbRecord };
+    return { user };
   }
 
 
@@ -48,9 +40,5 @@ export class AuthService {
     }
     const { password, createdAt, updatedAt, ...profile } = user;
     return profile;
-  }
-
-  async updateUserState(userId: string, state: boolean) {
-    return await this.userService.updateUserState(userId, state);
   }
 }

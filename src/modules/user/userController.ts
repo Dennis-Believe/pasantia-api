@@ -1,13 +1,18 @@
 import { Context } from 'hono'
 import { UserService } from './userService'
 import { userSchema } from './dto/user.dto'
-
-import { encryptPassword } from '../auth/utils/authUtils'
+import {
+  encryptPassword,
+  generateTokenOtb,
+  sendEmail,
+} from '../auth/utils/authUtils'
+import { OTBService } from '../otb/otbService'
 export class UserController {
   private userService: UserService
-
-  constructor(userService: UserService) {
+  private otbService: OTBService
+  constructor(userService: UserService, otbService: OTBService) {
     this.userService = userService
+    this.otbService = otbService
   }
 
   createAccount = async (c: Context) => {
@@ -42,8 +47,12 @@ export class UserController {
         password: userPassword,
         birthDate: formattedBirthDate,
       })
+      // Enviar Token al Email del usuario para verificar cuenta crear
+      const tokenOTB = generateTokenOtb()
+      await this.otbService.createOTB(insertedUser.id, +tokenOTB)
+      await sendEmail(email, tokenOTB)
 
-      return c.json('Creado correctamente')
+      return c.json('Creado correctamente, verifique su email')
     } catch (error) {
       console.error(error)
       return c.json('Hubo un error', 500)

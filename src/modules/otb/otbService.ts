@@ -1,10 +1,10 @@
 import { eq } from 'drizzle-orm';
-import db from '@/db/db.client';
-import { otb } from '@/db/schema/otb';
-import { users } from '@/db/schema/users';
 import crypto from 'crypto';
 import { env } from '../../config/env';
 import { transporter } from '../auth/utils/authUtils';
+import db from '../../db/db.client';
+import { users } from '../../db/schema/users';
+import { otb } from '../../db/schema/otb';
 
 export class OTBService {
   private dbClient;
@@ -12,7 +12,15 @@ export class OTBService {
   constructor(dbClient = db) {
     this.dbClient = dbClient;
   }
-
+  
+  async createOTB(userId: string, token: number) {
+    console.log(userId)
+    console.log(token);
+    return await this.dbClient.insert(otb).values({
+      userId,
+      token,
+  })
+  }
   async getOTBByEmail(email: string) {
 
     const user = await this.dbClient.query.users.findFirst({
