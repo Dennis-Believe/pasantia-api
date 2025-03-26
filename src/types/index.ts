@@ -21,3 +21,4 @@ export const authSchema = z
     message: 'Los passwords no son iguales',
     path: ['password_confirmation'],
   })
+export type User = z.infer<typeof authSchema>

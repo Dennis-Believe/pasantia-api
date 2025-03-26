@@ -1,6 +1,7 @@
-import { AuthController } from '@/controllers/AuthController';
+
+import { loginController } from '@/controllers/AuthController';
 import { Hono } from 'hono';
 
 export const authRoutes = new Hono();
 
-authRoutes.post('/prueba',AuthController.prueba)
+authRoutes.post('/prueba',loginController.login)
