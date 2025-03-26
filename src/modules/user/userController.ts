@@ -1,6 +1,6 @@
 import { Context } from 'hono'
 import { UserService } from './userService'
-import { authSchema } from './dto/user.dto'
+import { userSchema } from './dto/user.dto'
 
 import { encryptPassword } from '../auth/utils/authUtils'
 export class UserController {
@@ -15,7 +15,7 @@ export class UserController {
       const body = await c.req.json()
 
       // Validación
-      const result = authSchema.safeParse(body)
+      const result = userSchema.safeParse(body)
       if (!result.success) {
         return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
       }
