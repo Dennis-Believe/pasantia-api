@@ -1,3 +1,4 @@
+import 'module-alias/register'
 import { Hono } from 'hono'
 import { cors } from 'hono/cors'
 import { prettyJSON } from 'hono/pretty-json'
@@ -21,9 +22,9 @@ app.get('/', async (c) => {
   console.log(result)
   return c.json({ message: 'Hello World' })
 })
-app.route('/api/user', userRoutes);
-app.route('/api/otb',otbRoutes);
-app.route('/api/auth',authRoutes);
+app.route('/api/user', userRoutes)
+app.route('/api/otb', otbRoutes)
+app.route('/api/auth', authRoutes)
 const port = env.port
 console.log(`Servidor iniciado en http://localhost:${port}`)
 
