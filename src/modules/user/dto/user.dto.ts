@@ -19,7 +19,7 @@ export const userSchema = z
       .refine((value) => /[!@#$%^&*(),.?":{}|<>]/.test(value), {
         message: 'Debe contener al menos un símbolo especial',
       }),
-    password_confirmation: z.string(),
+    passwordConfirmation: z.string(),
     birthDate: z
       .string()
       .datetime()
@@ -31,7 +31,7 @@ export const userSchema = z
       .email('Email no válido')
       .min(1, 'El email no puede ir vacío'),
   })
-  .refine((data) => data.password === data.password_confirmation, {
+  .refine((data) => data.password === data.passwordConfirmation, {
     message: 'Los passwords no son iguales',
     path: ['password_confirmation'],
   })

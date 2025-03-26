@@ -20,7 +20,7 @@ export class UserService {
     return this.dbClient
       .insert(users)
       .values(newUser)
-      .returning({ id: users.id })
+      .returning({ id: users.id , firstName: users.firstName})
   }
 
   async findUserById(userId: string) {
