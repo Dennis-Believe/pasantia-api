@@ -7,9 +7,9 @@ export const encryptPassword = async (password: string) => {
     return hashedPassword
 }
 export const decryptPassword = async (password: string) => {
-    var bytes = CryptoJS.AES.decrypt(password)
-    var decryptedPassword = await bytes.toString(CryptoJS.enc.Utf8)
-    return decryptedPassword
+      var bytes = await CryptoJS.AES.decrypt(password,env.key);
+      var decryptedPassword =await bytes.toString(CryptoJS.enc.Utf8);
+      return decryptedPassword
 }
 export const transporter = nodemailer.createTransport({
     service: 'gmail',

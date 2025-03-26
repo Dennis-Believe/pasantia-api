@@ -17,18 +17,17 @@ async function sendEmail(email:any,token:any){
           from: env.gmail_user,
           to: email,
           subject: "CODIGO DE AUTENTICACION",
-          text:token,
+          text:token.toString(),
         });
         return "ok"
       } catch (error: any) {
-        return error;
+        return error.message;
       }
 }
 export const OtbController={
     async getOTB(c:any)
     {
         const { email } = otbSchema.parse(await c.req.json());
-        console.log(email);
         const user = await db.query.users.findFirst({
             where: eq(users.email, email),
           });
@@ -44,13 +43,16 @@ export const OtbController={
         if(!otbs)
         {
             const n=crypto.randomInt(1000, 1000000);
+            console.log(n);
             const to=await db.insert(otb).values({userId:user.id, token: n }).returning();
+            
             const r=await sendEmail(user.email,to[0].token);
+          
             if(r=="ok")
             {
                 return c.json({ message: 'OTB Send successful'})
             }
-            return c.json({message: "ERROR ON SEND OTB"});
+            return c.json({message: r});
         }
         else
         {
