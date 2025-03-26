@@ -10,7 +10,6 @@
     "studio": "drizzle-kit studio"
   },
   "dependencies": {
-    "@esbuild/linux-x64": "^0.25.1",
     "@hono/node-server": "^1.14.0",
     "@types/jsonwebtoken": "^9.0.9",
     "@types/nodemailer": "^6.4.17",
@@ -26,7 +25,9 @@
   "devDependencies": {
     "@types/pg": "^8.11.11",
     "drizzle-kit": "^0.30.5",
+    "ts-node": "^10.9.2",
     "tsx": "^4.19.3",
+    "typescript": "^5.8.2",
     "wrangler": "^3.109.2"
   }
 }

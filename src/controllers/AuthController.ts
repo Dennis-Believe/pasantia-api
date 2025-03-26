@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import db from '@/db/db.client'; 
+import db from '../db/db.client'; 
 import { eq } from 'drizzle-orm';
-import { users } from '@/db/schema/users';
+import { users } from '../db/schema/users';
 import {env} from '../config/env'
-import { decryptPassword } from '@/utils/userUtils';
-import { otb } from '@/db/schema/otb';
+import { decryptPassword } from '../utils/userUtils';
+import { otb } from '../db/schema/otb';
 import { setCookie } from 'hono/cookie';
 import jwt from 'jsonwebtoken' 
 

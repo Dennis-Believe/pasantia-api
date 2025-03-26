@@ -15,7 +15,9 @@ app.use('*', prettyJSON())
 app.use('*', logger())
 
 app.get('/', async (c) => {
-  const result = await db.query.users.findMany()
+  const result = await db.query.users.findMany({
+    limit: 1,
+  })
   console.log(result)
   return c.json({ message: 'Hello World' })
 })

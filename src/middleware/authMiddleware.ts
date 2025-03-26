@@ -2,10 +2,10 @@ import type { Context, MiddlewareHandler } from 'hono'
 import { setCookie } from 'hono/cookie'
 import { env } from '../config/env'
 import jwt from 'jsonwebtoken'
-import db from '@/db/db.client'
+import db from '../db/db.client'
 import { eq } from 'drizzle-orm'
-import { users } from '@/db/schema'
-import { User } from '@/types'
+import { users } from '../db/schema'
+import { User } from '../types'
 
 export const authenticate = (): MiddlewareHandler => {
   return async (c, next) => {

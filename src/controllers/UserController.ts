@@ -1,7 +1,7 @@
-import { UserService } from '@/services/userService';
-import { authSchema } from '@/types';
-import { encryptPassword } from '@/utils/userUtils';
-import { generateTokenOtb } from '@/utils/tokenOTB';
+import { UserService } from '../services/userService';
+import { authSchema } from '../types';
+import { encryptPassword } from '../utils/userUtils';
+import { generateTokenOtb } from '../utils/tokenOTB';
 import { Context } from 'hono';
 
 export class userController {
