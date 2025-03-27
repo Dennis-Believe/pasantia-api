@@ -21,4 +21,22 @@ export class PostService {
     {
         return this.dbClient.update(posts).set({isDeleted: true}).where(eq(posts.id, id))
     }
+    async putPostById(id:string,content:string,userId:string)
+    {
+      const post=await this.dbClient.query.posts.findFirst({
+            where: eq(posts.id, id),
+          })
+      if(post && post.userId===userId)
+      {
+        const newPost=this.dbClient.update(posts).set({
+          content
+        }).where(eq(posts.id,id)).returning();
+        return newPost;
+      }
+      else
+      {
+        return "Error el post no se encontro";
+      }
+      
+    }
 }

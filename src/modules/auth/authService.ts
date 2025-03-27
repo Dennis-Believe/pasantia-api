@@ -13,7 +13,6 @@ export class AuthService {
 
   async validateCredentials(email: string, password: string) {
     const user = await this.userService.findUserByEmail(email); 
-    console.log(user)
     if (!user ) {
       throw new Error('Invalid credentials ');
     }

@@ -13,3 +13,4 @@ const postController=new PostController(postService,userService);
 
 postRoutes.post('/',postController.createNewPost);
 postRoutes.delete('/delete/:id',authenticate,postController.deletePost)
+postRoutes.put('/update/:id',postController.updatePost);
