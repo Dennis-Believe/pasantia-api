@@ -31,4 +31,7 @@ export class UserService {
   async updateUserState(userId: string, state: boolean) {
     return this.dbClient.update(users).set({ state }).where(eq(users.id, userId));
   }
+  async updateUserProfile(firstName: string, lastName:string, password:string, birthDate: string, userId: string){
+    return this.dbClient.update(users).set({firstName, lastName, password, birthDate}).where(eq(users.id, userId))
+  }
 }
