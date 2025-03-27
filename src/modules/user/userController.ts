@@ -7,12 +7,19 @@ import {
   sendEmail,
 } from '../auth/utils/authUtils'
 import { OTBService } from '../otb/otbService'
+import { PostService } from '../post/postService'
 export class UserController {
   private userService: UserService
   private otbService: OTBService
-  constructor(userService: UserService, otbService: OTBService) {
+  private postService: PostService
+  constructor(
+    userService: UserService,
+    otbService: OTBService,
+    postService: PostService,
+  ) {
     this.userService = userService
     this.otbService = otbService
+    this.postService = postService
   }
 
   createAccount = async (c: Context) => {
@@ -56,6 +63,15 @@ export class UserController {
     } catch (error) {
       console.error(error)
       return c.json('Hubo un error', 500)
+    }
+  }
+  getPosts = async (c: Context) => {
+    try {
+      const { id } = c.get('user')
+      const posts = await this.postService.getPostsById(id)
+      return c.json(posts)
+    } catch (error) {
+      return c.json('Hubo un errorr', 500)
     }
   }
 }
