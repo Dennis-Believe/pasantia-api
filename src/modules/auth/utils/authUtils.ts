@@ -2,6 +2,7 @@ import { env } from '../../../config/env'
 var CryptoJS = require('crypto-js')
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken'
+import { Context } from 'hono';
 
 export const encryptPassword = async (password: string) => {
   var hashedPassword = await CryptoJS.AES.encrypt(password, env.key).toString()
@@ -46,4 +47,15 @@ export async function verifyJwtToken(token:string)
 {
     const secret = env.key || 'secret_key';
     return jwt.verify(token, secret);
+}
+
+export async function getUserIdByAuthorization(c:Context) {
+    const bearer = c.req.header('Authorization')
+    if (!bearer) {
+    const error = new Error('No autorizado')
+    return c.json(error)
+    }
+    const token = bearer.split(' ')[1]
+    const decoded:any = await verifyJwtToken(token);
+    return decoded.userId;
 }
