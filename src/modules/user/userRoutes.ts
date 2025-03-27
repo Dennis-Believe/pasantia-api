@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { UserService } from './userService';
 import { UserController } from './userController';
 import { OTBService } from '../otb/otbService';
-import { authenticate } from '../../db/middlewares/auth';
+import { authenticate } from '../../middlewares/auth';
 import { PostService } from '../post/postService';
 
 export const userRoutes = new Hono();
@@ -16,4 +16,4 @@ const userController = new UserController(userService,otbService,postService);
 
 // Definir las rutas
 userRoutes.post('/create-account', userController.createAccount);
-userRoutes.get('/posts',authenticate,userController.getPosts)
+userRoutes.post('/posts',authenticate,userController.getPosts)

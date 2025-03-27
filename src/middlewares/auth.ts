@@ -1,5 +1,5 @@
 import { Context, Next } from 'hono'
-import { verifyJwtToken } from '../../modules/auth/utils/authUtils'
+import { verifyJwtToken } from '../modules/auth/utils/authUtils'
 import { getCookie } from 'hono/cookie'
 export const authenticate = async (c: Context, next: Next) => {
   try {

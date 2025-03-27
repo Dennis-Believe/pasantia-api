@@ -34,3 +34,9 @@ export const userSchema = z
     path: ['password_confirmation'],
   })
 export type User = z.infer<typeof userSchema>
+
+export const postPaginationSchema = z.object({
+  pageSize:z.number().min(1,'Inserte un valor igual o mayor a 1'),
+  page: z.number().min(1,'Inserte un valor igual o mayor a 1')
+})
+export type PostPagination = z.infer<typeof postPaginationSchema>

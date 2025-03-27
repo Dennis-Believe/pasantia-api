@@ -1,6 +1,6 @@
 import { Context } from 'hono'
 import { UserService } from './userService'
-import { userSchema } from './dto/user.dto'
+import { postPaginationSchema, userSchema } from './dto/user.dto'
 import {
   encryptPassword,
   generateTokenOtb,
@@ -68,7 +68,14 @@ export class UserController {
   getPosts = async (c: Context) => {
     try {
       const { id } = c.get('user')
-      const posts = await this.postService.getPostsById(id)
+      const body = await c.req.json()
+      const result = postPaginationSchema.safeParse(body)
+      if(!result.success){
+        return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
+      }
+      const { page, pageSize } = result.data
+
+      const posts = await this.postService.getPostsById(id,page,pageSize);
       return c.json(posts)
     } catch (error) {
       return c.json('Hubo un errorr', 500)
