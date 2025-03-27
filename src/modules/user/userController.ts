@@ -1,18 +1,25 @@
 import { Context } from 'hono'
 import { UserService } from './userService'
-import { userSchema } from './dto/user.dto'
+import { postPaginationSchema, userSchema } from './dto/user.dto'
 import {
   encryptPassword,
   generateTokenOtb,
   sendEmail,
 } from '../auth/utils/authUtils'
 import { OTBService } from '../otb/otbService'
+import { PostService } from '../post/postService'
 export class UserController {
   private userService: UserService
   private otbService: OTBService
-  constructor(userService: UserService, otbService: OTBService) {
+  private postService: PostService
+  constructor(
+    userService: UserService,
+    otbService: OTBService,
+    postService: PostService,
+  ) {
     this.userService = userService
     this.otbService = otbService
+    this.postService = postService
   }
 
   createAccount = async (c: Context) => {
@@ -56,6 +63,22 @@ export class UserController {
     } catch (error) {
       console.error(error)
       return c.json('Hubo un error', 500)
+    }
+  }
+  getPosts = async (c: Context) => {
+    try {
+      const { id } = c.get('user')
+      const body = await c.req.json()
+      const result = postPaginationSchema.safeParse(body)
+      if(!result.success){
+        return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
+      }
+      const { page, pageSize } = result.data
+
+      const posts = await this.postService.getPostsById(id,page,pageSize);
+      return c.json(posts)
+    } catch (error) {
+      return c.json('Hubo un errorr', 500)
     }
   }
 }
