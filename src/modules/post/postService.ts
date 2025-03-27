@@ -17,4 +17,8 @@ export class PostService {
       const offset = ( page - 1 ) * pageSize;
       return this.dbClient.select().from(posts).where(and(eq(posts.userId, id), eq(posts.isDeleted, false))).limit(pageSize).offset(offset)
     }
+    async deletePostsById(id: string)
+    {
+        return this.dbClient.update(posts).set({isDeleted: true}).where(eq(posts.id, id))
+    }
 }

@@ -43,4 +43,13 @@ export class PostController{
         }
         
     }
+    deletePost = async (c:Context) => {
+        try {
+            const id = c.req.param('id')
+            await this.postService.deletePostsById(id);
+            return c.json('Post eliminado correctamente')
+        } catch (error) {
+            return c.json('Error, no se elimino el post',500)
+        }
+    }
 }
