@@ -15,6 +15,13 @@
       "when": 1742948436087,
       "tag": "0001_previous_franklin_storm",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1743085583249,
+      "tag": "0002_many_black_cat",
+      "breakpoints": true
     }
   ]
 }

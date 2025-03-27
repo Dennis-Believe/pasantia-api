@@ -23,11 +23,10 @@ app.get('/', async (c) => {
   console.log(result)
   return c.json({ message: 'Hello World' })
 })
-app.route('/api/user', userRoutes)
-app.route('/api/otb', otbRoutes)
-app.route('/api/auth', authRoutes)
-app.route('/api/post', postRoutes)
-
+app.route('/api/user', userRoutes);
+app.route('/api/otb', otbRoutes);
+app.route('/api/auth', authRoutes);
+app.route('/api/post',postRoutes);
 const port = env.port
 console.log(`Servidor iniciado en http://localhost:${port}`)
 
