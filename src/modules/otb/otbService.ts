@@ -44,6 +44,7 @@ export class OTBService {
     if(getOTB.token==token)
     {
       await this.dbClient.update(users).set({ state:true }).where(eq(users.id, user.id));
+      await this.dbClient.delete(otb).where(eq(otb.id,getOTB.id));
       return {message:"Account Authorized"}
     }
     } catch (error: any) {
