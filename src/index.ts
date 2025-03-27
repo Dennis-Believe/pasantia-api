@@ -9,7 +9,6 @@ import db from './db/db.client'
 import { userRoutes } from './modules/user/userRoutes'
 import { otbRoutes } from './modules/otb/otbRoutes'
 import { authRoutes } from './modules/auth/authRoutes'
-import { postRoutes } from './modules/post/postRoutes'
 const app = new Hono()
 
 app.use('*', cors())
@@ -23,10 +22,9 @@ app.get('/', async (c) => {
   console.log(result)
   return c.json({ message: 'Hello World' })
 })
-app.route('/api/user', userRoutes);
-app.route('/api/otb', otbRoutes);
-app.route('/api/auth', authRoutes);
-app.route('/api/post',postRoutes);
+app.route('/api/user', userRoutes)
+app.route('/api/otb', otbRoutes)
+app.route('/api/auth', authRoutes)
 const port = env.port
 console.log(`Servidor iniciado en http://localhost:${port}`)
 

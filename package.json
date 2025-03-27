@@ -16,7 +16,6 @@
     "dotenv": "^16.4.7",
     "drizzle-orm": "^0.41.0",
     "hono": "^4.7.5",
-    "hono-cloud": "file:",
     "jsonwebtoken": "^9.0.2",
     "module-alias": "^2.2.3",
     "nodemailer": "^6.10.0",
