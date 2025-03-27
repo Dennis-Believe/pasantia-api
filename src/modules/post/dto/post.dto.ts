@@ -6,3 +6,9 @@ export const postSchema = z.object({
     content: z.string(),    
 })
 export type POSTInput = z.infer<typeof postSchema>
+
+
+export const updatePostSchema = z.object({
+    content: z.string(),    
+})
+export type updatePOST = z.infer<typeof updatePostSchema>

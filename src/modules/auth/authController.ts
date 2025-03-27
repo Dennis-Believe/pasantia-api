@@ -55,10 +55,11 @@ export class AuthController {
   profile = async (c: Context) => {
     try {
       const token = getCookie(c,'token');
+      
       if (!token) {
         return c.json({ error: 'Not logged in' }, 401);
       }
-      const decoded: any = verifyJwtToken(token);
+      const decoded:any = await verifyJwtToken(token);
       const profile = await this.authService.getUserProfile(decoded.userId);
       return c.json({ profile });
     } catch (error: any) {

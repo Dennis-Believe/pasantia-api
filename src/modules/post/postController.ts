@@ -1,6 +1,6 @@
 import { Context } from "hono";
 import { PostService } from "./postService";
-import { postSchema } from "./dto/post.dto";
+import { postSchema, updatePostSchema } from "./dto/post.dto";
 import { UserService } from "../user/userService";
 
 
@@ -42,5 +42,29 @@ export class PostController{
             return c.json({ error: error.message }, 401);
         }
         
+    }
+    updatePost = async(c:Context) =>{
+        try
+        {
+            const id=c.req.param("id");
+            if(!id)
+            {
+                throw new Error("Id not found")
+            }
+            const body=await c.req.json();
+            const result=updatePostSchema.safeParse(body)
+            if (!result.success) {
+                return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
+            }
+            const {content}=result.data;
+            const up=await this.postService.putPostById(id,content);
+            return c.json("Contenido actualizado!")
+            
+        }
+        catch(error:any)
+        {
+            console.error(error);
+            return c.json({ error: error.message }, 401);
+        }
     }
 }

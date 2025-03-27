@@ -11,3 +11,4 @@ const userService=new UserService();
 const postController=new PostController(postService,userService);
 
 postRoutes.post('/',postController.createNewPost);
+postRoutes.put('/update/:id',postController.updatePost);
