@@ -9,15 +9,15 @@ export class OTBController {
     this.otbService = otbService;
   }
 
-  getOTB = async (c: Context) => {
+  validateOtb = async(c:Context)=>{
     try {
       const body = await c.req.json();
       const result = otbSchema.safeParse(body);
       if (!result.success) {
         return c.json({ errors: result.error.formErrors.fieldErrors }, 400);
       }
-      const { email } = result.data;
-      const response = await this.otbService.getOTBByEmail(email);
+      const { email, token } = result.data;
+      const response = await this.otbService.getOTBByEmail(email,token);
       return c.json(response);
     } catch (error: any) {
       console.error(error);
