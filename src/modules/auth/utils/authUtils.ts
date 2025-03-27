@@ -40,7 +40,7 @@ export async function generateJWT(userId:string) {
 
     const payload = { userId: userId };
     const secret = env.key || 'secret_key';
-    const token = jwt.sign(payload, secret, { expiresIn: '10m' });
+    const token = jwt.sign(payload, secret, { expiresIn: '24h' });
     return token
 }
 export async function verifyJwtToken(token:string)
