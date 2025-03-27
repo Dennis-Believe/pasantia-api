@@ -2,14 +2,13 @@ import { env } from '../../../config/env'
 var CryptoJS = require('crypto-js')
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken'
-import { User } from '@/modules/user/dto/user.dto';
 
 export const encryptPassword = async (password: string) => {
   var hashedPassword = await CryptoJS.AES.encrypt(password, env.key).toString()
   return hashedPassword
 }
 export const decryptPassword = async (password: string) => {
-  var bytes = CryptoJS.AES.decrypt(password)
+  var bytes = CryptoJS.AES.decrypt(password,env.key);
   var decryptedPassword = await bytes.toString(CryptoJS.enc.Utf8)
   return decryptedPassword
 }

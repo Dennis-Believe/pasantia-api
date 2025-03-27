@@ -14,47 +14,42 @@ export class OTBService {
   }
   
   async createOTB(userId: string, token: number) {
-    console.log(userId)
-    console.log(token);
     return await this.dbClient.insert(otb).values({
       userId,
       token,
   })
   }
-  async getOTBByEmail(email: string) {
+  async findOtbByUserId(userId: string) {
+    return await db.query.otb.findFirst({
+      where: eq(otb.userId, userId),
+    });
+  }
+
+  async deleteOtbById(otbId: string) {
+    return await db.delete(otb).where(eq(otb.id,otbId));
+  }
+  async getOTBByEmail(email: string,token: number) {
 
     const user = await this.dbClient.query.users.findFirst({
       where: eq(users.email, email),
     });
     if (!user) {
-      throw new Error('Credenciales inválidas');
+      throw new Error('User not found');
     }
-
-    const existingOTB = await this.dbClient.query.otb.findFirst({
-      where: eq(otb.userId, user.id),
-    });
-    if (existingOTB) {
-      return { message: 'OTB exist' };
+    const getOTB= await this.dbClient.query.otb.findFirst({where: eq(otb.userId,user.id)});
+    if(!getOTB)
+    {
+      throw new Error('OTB not found');
     }
-
-    const token = crypto.randomInt(1000, 1000000);
-    console.log(token);
-
-    const [insertedOTB] = await this.dbClient
-      .insert(otb)
-      .values({ userId: user.id, token })
-      .returning();
-
-    try {
-      await transporter.sendMail({
-        from: env.gmail_user,
-        to: user.email,
-        subject: 'CODIGO DE AUTENTICACION',
-        text: token.toString(),
-      });
-      return { message: 'OTB Send successful' };
+    if(getOTB.token==token)
+    {
+      await this.dbClient.update(users).set({ state:true }).where(eq(users.id, user.id));
+      return {message:"Account Authorized"}
+    }
     } catch (error: any) {
       throw new Error(error.message);
     }
-  }
 }
+
+
+
