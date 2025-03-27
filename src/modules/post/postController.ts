@@ -19,11 +19,12 @@ export class PostController{
     createNewPost = async (c: Context) => {
         try{
             const body=await c.req.json();
+            const userId=await getUserIdByAuthorization(c);
             const result=postSchema.safeParse(body);
             if (!result.success) {
                 return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
             }
-            const{userId,title, content}=result.data;
+            const{title, content}=result.data;
             const u=await this.userService.findUserById(userId);
             if(!u)
             {
