@@ -1,4 +1,6 @@
-
+import { eq } from 'drizzle-orm';
+import db from '../../db/db.client';
+import { otb } from '../../db/schema/otb';
 import { UserService } from '../../modules/user/userService';
 import { decryptPassword } from './utils/authUtils';
 
@@ -10,10 +12,8 @@ export class AuthService {
   }
 
   
-
   async validateCredentials(email: string, password: string) {
-    const user = await this.userService.findUserByEmail(email); 
-    console.log(user)
+    const user = await this.userService.findUserByEmail(email);
     if (!user ) {
       throw new Error('Invalid credentials ');
     }
@@ -21,7 +21,9 @@ export class AuthService {
     {
       throw new Error('User Disabled');
     }
+
     
+
     const decryptedPassword = await decryptPassword(user.password);
     if (password !== decryptedPassword) {
       throw new Error('Invalid credentials');

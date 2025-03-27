@@ -7,4 +7,4 @@ export const otbRoutes = new Hono();
 const otbService = new OTBService();
 const otbController = new OTBController(otbService);
 
-otbRoutes.post('/', otbController.validateOtb);
+otbRoutes.post('/', otbController.getOTB);
