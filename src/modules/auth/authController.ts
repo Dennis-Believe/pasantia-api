@@ -44,18 +44,11 @@ export class AuthController {
       if (!authHeader) {
         return c.json({ error: 'Not logged in' }, 401);
       }
-      const token = authHeader.replace('Bearer ', '');
-  
-      const decoded = await verifyJwtToken(token);
-      if (!decoded) {
-        return c.json({ error: 'Invalid token' }, 400);
-      }
-  
+      authHeader.replace('Bearer ', '');
       return c.json({ message: 'Logout successful' });
     } catch (error) {
       return c.json({ error: 'Invalid token or error during logout' }, 400);
     }
-  
   };
 
   profile = async (c: Context) => {
