@@ -1,0 +1,1 @@
+ALTER TABLE "sessions" ALTER COLUMN "timeOut" SET DATA TYPE date;
