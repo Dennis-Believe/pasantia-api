@@ -2,7 +2,7 @@ import { Context } from 'hono';
 import { setCookie, deleteCookie, getCookie } from 'hono/cookie';
 import { loginSchema } from './dto/auth.dto';
 import { AuthService } from './authService';
-import { generateJWT, getUserIdByAuthorization, verifyJwtToken } from './utils/authUtils';
+import { generateJWT, generateUniqueId, getUserIdByAuthorization, verifyJwtToken } from './utils/authUtils';
 
 export class AuthController {
   private authService: AuthService;
@@ -25,12 +25,25 @@ export class AuthController {
 
       const { user } = await this.authService.validateCredentials(email, password);
       
-     
+      const idSession=generateUniqueId();
 
-      const token = await generateJWT(user.id);
+      const token = await generateJWT(user.id,idSession);
+      const expirationDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
-      setCookie(c, 'token', token, { httpOnly: true, secure: true, sameSite: "Strict" });
+      const year = expirationDate.getFullYear();
+      const month = String(expirationDate.getMonth() + 1).padStart(2, '0');
+      const day = String(expirationDate.getDate()).padStart(2, '0');
 
+      const formattedDate = `${year}-${month}-${day}`; 
+
+      const sesion=await this.authService.createSession({
+        id:idSession,
+        userId:user.id,
+        token: token,
+        isEnabled:true,
+        lifeTime:3600,
+        timeOut: formattedDate,
+      })
 
       return c.json({ message: 'Login successful', token: `Bearer ${token}` });
     } catch (error: any) {

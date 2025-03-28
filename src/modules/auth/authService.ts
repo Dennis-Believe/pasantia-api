@@ -1,12 +1,16 @@
 
+import db from '../../db/db.client';
+import { sessions } from '../../db/schema/sessions';
 import { UserService } from '../../modules/user/userService';
 import { decryptPassword } from './utils/authUtils';
 
 export class AuthService {
   private userService: UserService;
+  private dbClient;
 
-  constructor(userService: UserService = new UserService()) {
+  constructor(userService: UserService = new UserService(), dbClient=db) {
     this.userService = userService;
+    this.dbClient=dbClient
   }
 
   
@@ -37,5 +41,10 @@ export class AuthService {
     }
     const { password, createdAt, updatedAt, ...profile } = user;
     return profile;
+  }
+
+  async createSession(newSession:typeof sessions.$inferInsert)
+  {
+    return this.dbClient.insert(sessions).values(newSession).returning({id:sessions.id});
   }
 }
