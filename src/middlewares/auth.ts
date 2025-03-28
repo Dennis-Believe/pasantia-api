@@ -1,7 +1,10 @@
 import { Context, Next } from 'hono'
 import { verifyJwtToken } from '../modules/auth/utils/authUtils'
+import { SessionService } from '../modules/sessions/sessionService'
+import { boolean } from 'drizzle-orm/gel-core';
 
 export const authenticate = async (c: Context, next: Next) => {
+  const sessionService = new SessionService();
   try {
     const bearer = c.req.header('Authorization')
     if (!bearer) {
@@ -12,7 +15,12 @@ export const authenticate = async (c: Context, next: Next) => {
 
     try {
       const decoded: any = await verifyJwtToken(token)
-      if (decoded && decoded.userId) {
+      if (decoded && decoded.userId && decoded.sessionId) {
+        const [result] = await sessionService.isEnabled(decoded.sessionId)
+        const enabled = result.isEnabled;
+        if(!enabled){
+          return c.json({ error: 'Token no valido' })
+        }
         c.set('user', { id: decoded.userId })
         await next()
       } else {
