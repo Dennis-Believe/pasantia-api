@@ -1,6 +1,6 @@
 import { Context } from 'hono'
 import { UserService } from './userService'
-import { postPaginationSchema, userSchema } from './dto/user.dto'
+import { postPaginationSchema, updateUserProfileSchema, userSchema } from './dto/user.dto'
 import {
   encryptPassword,
   generateTokenOtb,
@@ -79,6 +79,26 @@ export class UserController {
       return c.json(posts)
     } catch (error) {
       return c.json('Hubo un errorr', 500)
+    }
+  }
+  updateUser = async (c:Context) =>{
+    try {
+      const body = await c.req.json()
+      const { id } = c.get('user')
+      // Validación
+      const result = updateUserProfileSchema.safeParse(body)
+      if (!result.success) {
+        return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
+      }
+      const { firstName, lastName, password, birthDate } = result.data;
+      
+      const formattedBirthDate = birthDate.toISOString().split('T')[0]
+
+      await this.userService.updateUserProfile(firstName, lastName, password, formattedBirthDate, id)
+
+      return c.json('Usuario actualizado correctamente')
+    } catch (error) {
+      return c.json('Hubo un error')
     }
   }
 }
