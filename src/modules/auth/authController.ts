@@ -53,11 +53,16 @@ export class AuthController {
 
   logout = async (c: Context) => {
     try {
-      const authHeader = c.req.header('Authorization');
-      if (!authHeader) {
-        return c.json({ error: 'Not logged in' }, 401);
+      const decoded=await getUserIdByAuthorization(c);
+      if(!decoded)
+      {
+         throw new Error("no se encontro el token")
       }
-      authHeader.replace('Bearer ', '');
+      const s=await this.authService.updateSessionById(decoded.sessionId);
+      if(s==="Sesion no valida")
+      {
+        throw new Error(s);
+      }
       return c.json({ message: 'Logout successful' });
     } catch (error) {
       return c.json({ error: 'Invalid token or error during logout' }, 400);
