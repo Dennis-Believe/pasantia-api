@@ -1,7 +1,9 @@
 import { Context, Next } from 'hono'
 import { verifyJwtToken } from '../modules/auth/utils/authUtils'
+import { SessionService } from '../modules/sessions/sessionService'
 
 export const authenticate = async (c: Context, next: Next) => {
+  const sessionService = new SessionService();
   try {
     const bearer = c.req.header('Authorization')
     if (!bearer) {
@@ -12,7 +14,9 @@ export const authenticate = async (c: Context, next: Next) => {
 
     try {
       const decoded: any = await verifyJwtToken(token)
-      if (decoded && decoded.userId) {
+      if (decoded && decoded.userId && decoded.sessionId) {
+        const result = await sessionService.isEnabled(decoded.sessionId)
+        console.log(result);
         c.set('user', { id: decoded.userId })
         await next()
       } else {
