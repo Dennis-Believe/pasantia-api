@@ -65,4 +65,14 @@ export async function getUserIdByAuthorization(c:Context) {
 export function generateUniqueId(): string {
   return randomUUID();
 }
+export function generateExpirationDate()
+{
+  const expirationDate = new Date(Date.now() + 24 * 60 * 60 * 1000);
 
+      const year = expirationDate.getFullYear();
+      const month = String(expirationDate.getMonth() + 1).padStart(2, '0');
+      const day = String(expirationDate.getDate()).padStart(2, '0');
+
+      const formattedDate = `${year}-${month}-${day}`; 
+      return formattedDate
+}

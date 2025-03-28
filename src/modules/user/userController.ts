@@ -4,24 +4,35 @@ import { passwordSchema, postPaginationSchema, updateUserProfileSchema, userSche
 import {
   decryptPassword,
   encryptPassword,
+  generateExpirationDate,
+  generateJWT,
   generateTokenOtb,
+  generateUniqueId,
   getUserIdByAuthorization,
   sendEmail,
 } from '../auth/utils/authUtils'
 import { OTBService } from '../otb/otbService'
 import { PostService } from '../post/postService'
+import { AuthService } from '../auth/authService'
+import { SessionService } from '../sessions/sessionService'
 export class UserController {
   private userService: UserService
   private otbService: OTBService
   private postService: PostService
+  private authService : AuthService
+  private sessionService : SessionService
   constructor(
     userService: UserService,
     otbService: OTBService,
     postService: PostService,
+    authService: AuthService,
+    sessionService: SessionService,
   ) {
     this.userService = userService
     this.otbService = otbService
     this.postService = postService
+    this.authService = authService
+    this.sessionService = sessionService
   }
 
   createAccount = async (c: Context) => {
@@ -102,4 +113,51 @@ export class UserController {
       return c.json('Hubo un error')
     }
   }
+  changePassword = async (c:Context) =>{
+    try
+    {
+      const body = await c.req.json();
+      const result = passwordSchema.safeParse(body);
+      if(!result.success){
+        return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
+      }
+      const decoded=await getUserIdByAuthorization(c);
+      const [r]= await this.sessionService.isEnabled(decoded.sessionId);
+      if(!r)
+      {
+        throw new Error("Invalid Token");
+      }
+      const user=await this.userService.findUserById(decoded.userId);
+      if(!user)
+      {
+        throw new Error("User not found");
+      }
+      const {password, newPassword}=result.data;
+      const pDecode=await decryptPassword(user?.password);
+      if(pDecode===password)
+      {
+
+        const p=await encryptPassword(newPassword);
+        await this.userService.updatePassword(p,decoded.userId);
+        await this.userService.updateAllSessions(user.id);
+        const id=generateUniqueId();
+        const t=await generateJWT(user.id,id);
+        const date= generateExpirationDate()
+        await this.authService.createSession({
+          id:id,
+          userId: user.id,
+          token: t,
+          lifeTime: 3600,
+          timeOut: date,
+        })
+        return c.json({message:"Password Updated!", token:`Bearer ${t}`},200);
+      }
+      throw new Error("Invalid Credentials")
+    }
+    catch(error:any)
+    {
+      console.error(error);
+      return c.json({ error: error.message }, 401);
+    }
+  }
 }

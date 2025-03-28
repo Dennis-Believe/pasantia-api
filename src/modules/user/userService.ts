@@ -2,6 +2,7 @@ import { eq } from 'drizzle-orm'
 import db from '../../db/db.client'
 import { users } from '../../db/schema/users'
 import { otb } from '../../db/schema/otb'
+import { sessions } from '../../db/schema/sessions'
 
 export class UserService {
   private dbClient
@@ -33,5 +34,13 @@ export class UserService {
   }
   async updateUserProfile(firstName: string, lastName:string,  birthDate: string, userId: string){
     return this.dbClient.update(users).set({firstName, lastName, birthDate}).where(eq(users.id, userId))
+  }
+  async updatePassword(password:string,userId:string)
+  {
+    return this.dbClient.update(users).set({password}).where(eq(users.id,userId));
+  }
+  async updateAllSessions(userId:string)
+  {
+    return this.dbClient.update(sessions).set({isEnabled:false}).where(eq(sessions.userId,userId));
   }
 }
