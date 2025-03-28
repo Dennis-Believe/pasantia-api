@@ -2,7 +2,7 @@ import { Context } from 'hono';
 import { setCookie, deleteCookie, getCookie } from 'hono/cookie';
 import { loginSchema } from './dto/auth.dto';
 import { AuthService } from './authService';
-import { generateJWT, verifyJwtToken } from './utils/authUtils';
+import { generateJWT, getUserIdByAuthorization, verifyJwtToken } from './utils/authUtils';
 
 export class AuthController {
   private authService: AuthService;
@@ -40,27 +40,28 @@ export class AuthController {
 
   logout = async (c: Context) => {
     try {
-      const token = getCookie(c,"token");
-      if (!token) {
+      const authHeader = c.req.header('Authorization');
+      if (!authHeader) {
         return c.json({ error: 'Not logged in' }, 401);
       }
-      const decoded: any = await verifyJwtToken(token);
-      deleteCookie(c, 'token');
+      const token = authHeader.replace('Bearer ', '');
+  
+      const decoded = await verifyJwtToken(token);
+      if (!decoded) {
+        return c.json({ error: 'Invalid token' }, 400);
+      }
+  
       return c.json({ message: 'Logout successful' });
-    } catch (error: any) {
+    } catch (error) {
       return c.json({ error: 'Invalid token or error during logout' }, 400);
     }
+  
   };
 
   profile = async (c: Context) => {
     try {
-      const token = getCookie(c,'token');
-      
-      if (!token) {
-        return c.json({ error: 'Not logged in' }, 401);
-      }
-      const decoded:any = await verifyJwtToken(token);
-      const profile = await this.authService.getUserProfile(decoded.userId);
+      const userId = await getUserIdByAuthorization(c);
+      const profile = await this.authService.getUserProfile(userId);
       return c.json({ profile });
     } catch (error: any) {
       return c.json({ error: 'Invalid token or error retrieving profile' }, 400);
