@@ -3,6 +3,9 @@ var CryptoJS = require('crypto-js')
 import nodemailer from 'nodemailer';
 import jwt from 'jsonwebtoken'
 import { Context } from 'hono';
+import { randomUUID } from 'crypto';
+
+
 
 export const encryptPassword = async (password: string) => {
   var hashedPassword = await CryptoJS.AES.encrypt(password, env.key).toString()
@@ -36,9 +39,9 @@ export async function sendEmail(email: any, token: any) {
     return error.message
   }
 }
-export async function generateJWT(userId:string) {
+export async function generateJWT(userId:string,sessionId:string) {
 
-    const payload = { userId: userId };
+    const payload = { userId: userId, sessionId: sessionId};
     const secret = env.key || 'secret_key';
     const token = jwt.sign(payload, secret, { expiresIn: '24h' });
     return token
@@ -59,3 +62,7 @@ export async function getUserIdByAuthorization(c:Context) {
     const decoded:any = await verifyJwtToken(token);
     return decoded.userId;
 }
+export function generateUniqueId(): string {
+  return randomUUID();
+}
+
