@@ -92,11 +92,10 @@ export class UserController {
       if (!result.success) {
         return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
       }
-      const { firstName, lastName, password, birthDate } = result.data;
-      const userPassword = await encryptPassword(password)
+      const { firstName, lastName, birthDate } = result.data;
       const formattedBirthDate = birthDate.toISOString().split('T')[0]
 
-      await this.userService.updateUserProfile(firstName, lastName, userPassword, formattedBirthDate, id)
+      await this.userService.updateUserProfile(firstName, lastName, formattedBirthDate, id)
 
       return c.json('Usuario actualizado correctamente')
     } catch (error) {
