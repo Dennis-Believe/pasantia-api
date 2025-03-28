@@ -1,9 +1,11 @@
 import { Context } from 'hono'
 import { UserService } from './userService'
-import { postPaginationSchema, updateUserProfileSchema, userSchema } from './dto/user.dto'
+import { passwordSchema, postPaginationSchema, updateUserProfileSchema, userSchema } from './dto/user.dto'
 import {
+  decryptPassword,
   encryptPassword,
   generateTokenOtb,
+  getUserIdByAuthorization,
   sendEmail,
 } from '../auth/utils/authUtils'
 import { OTBService } from '../otb/otbService'

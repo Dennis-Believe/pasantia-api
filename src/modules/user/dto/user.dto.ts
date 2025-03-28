@@ -71,3 +71,23 @@ export const updateUserProfileSchema = z
   path: ['password_confirmation'],
 })
 export type updateUserProfile = z.infer<typeof updateUserProfileSchema>
+
+
+export const passwordSchema = z.object({
+  newPassword: z
+      .string()
+      .min(8, 'El password es muy corto, min 8 caracteres')
+      .refine((value) => /[A-Z]/.test(value), {
+        message: 'Debe contener al menos una letra mayúscula',
+      })
+      .refine((value) => /[a-z]/.test(value), {
+        message: 'Debe contener al menos una letra minúscula',
+      })
+      .refine((value) => /\d/.test(value), {
+        message: 'Debe contener al menos un número',
+      })
+      .refine((value) => /[!@#$%^&*(),.?":{}|<>]/.test(value), {
+        message: 'Debe contener al menos un símbolo especial',
+      }),
+    password: z.string().min(1,"Credenciales Invalidas"),
+})
