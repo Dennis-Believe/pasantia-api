@@ -97,16 +97,25 @@ export class UserController {
   updateUser = async (c:Context) =>{
     try {
       const body = await c.req.json()
+      var formattedBirthDate
       const { id } = c.get('user')
       // Validación
       const result = updateUserProfileSchema.safeParse(body)
       if (!result.success) {
         return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
       }
-      const { firstName, lastName, birthDate } = result.data;
-      const formattedBirthDate = birthDate.toISOString().split('T')[0]
-
-      await this.userService.updateUserProfile(firstName, lastName, formattedBirthDate, id)
+      const filteredUpdates : any = Object.entries(result.data).reduce(
+        (acc, [key, value])=> (value !== undefined ? { ...acc, [key] : value } : acc),
+        {}
+      )
+      if(Object.keys(filteredUpdates).length ===0){
+        return c.json({error: 'No se enviaron datos validos para actualizar'}, 400)
+      }
+      if(filteredUpdates.birthDate){
+        formattedBirthDate = filteredUpdates.birthDate.toISOString().split('T')[0]
+        filteredUpdates.birthDate = formattedBirthDate
+      }
+      await this.userService.updateUserProfile(filteredUpdates, id)
 
       return c.json('Usuario actualizado correctamente')
     } catch (error) {
