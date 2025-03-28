@@ -19,19 +19,19 @@ export class PostController{
     createNewPost = async (c: Context) => {
         try{
             const body=await c.req.json();
-            const userId=await getUserIdByAuthorization(c);
+            const decoded=await getUserIdByAuthorization(c);
             const result=postSchema.safeParse(body);
             if (!result.success) {
                 return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
             }
             const{title, content}=result.data;
-            const u=await this.userService.findUserById(userId);
+            const u=await this.userService.findUserById(decoded.userId);
             if(!u)
             {
                 throw(new Error("User not found"));
             }
             const [insertedPost]=await this.postService.createPost({
-                userId,
+                userId:decoded.userId,
                 title,
                 content
             });
@@ -48,7 +48,7 @@ export class PostController{
     updatePost = async(c:Context) =>{
         try
         {
-            const userId=await getUserIdByAuthorization(c);
+            const decoded=await getUserIdByAuthorization(c);
             const id=c.req.param("id");
             if(!id)
             {
@@ -60,7 +60,7 @@ export class PostController{
                 return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
             }
             const {content}=result.data;
-            const up=await this.postService.putPostById(id,content,userId);
+            const up=await this.postService.putPostById(id,content,decoded.userId);
             if(up!="Error el post no se encontro")
             {
                 return c.json("Contenido actualizado!")

@@ -60,7 +60,7 @@ export async function getUserIdByAuthorization(c:Context) {
     }
     const token = bearer.split(' ')[1]
     const decoded:any = await verifyJwtToken(token);
-    return decoded.userId;
+    return decoded;
 }
 export function generateUniqueId(): string {
   return randomUUID();
