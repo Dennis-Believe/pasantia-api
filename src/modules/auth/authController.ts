@@ -24,6 +24,7 @@ export class AuthController {
       
 
       const { user } = await this.authService.validateCredentials(email, password);
+      console.log(user)
       
       const idSession=generateUniqueId();
 
@@ -71,8 +72,8 @@ export class AuthController {
 
   profile = async (c: Context) => {
     try {
-      const userId = await getUserIdByAuthorization(c);
-      const profile = await this.authService.getUserProfile(userId);
+      const decoded = await getUserIdByAuthorization(c);
+      const profile = await this.authService.getUserProfile(decoded.userId);
       return c.json({ profile });
     } catch (error: any) {
       return c.json({ error: 'Invalid token or error retrieving profile' }, 400);
