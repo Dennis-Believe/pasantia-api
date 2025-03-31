@@ -16,15 +16,15 @@ export class AuthService {
     if (!user ) {
       throw new Error('Invalid credentials ');
     }
+    const decryptedPassword = await decryptPassword(user.password);
+    if (password !== decryptedPassword) {
+      throw new Error('Invalid credentials');
+    }
     if( !user.state)
     {
       throw new Error('User Disabled');
     }
     
-    const decryptedPassword = await decryptPassword(user.password);
-    if (password !== decryptedPassword) {
-      throw new Error('Invalid credentials');
-    }
 
     return { user };
   }
