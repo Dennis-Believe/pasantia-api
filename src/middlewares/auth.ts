@@ -21,7 +21,7 @@ export const authenticate = async (c: Context, next: Next) => {
         if(!enabled){
           return c.json({ error: 'Token no valido' })
         }
-        c.set('user', { id: decoded.userId })
+        c.set('user', { id: decoded.userId , sessionId: decoded.sessionId})
         await next()
       } else {
         return c.json({ error: 'Token no valido' })

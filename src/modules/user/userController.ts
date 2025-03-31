@@ -8,30 +8,25 @@ import {
   generateJWT,
   generateTokenOtb,
   generateUniqueId,
-  getUserIdByAuthorization,
   sendEmail,
 } from '../auth/utils/authUtils'
 import { OTBService } from '../otb/otbService'
 import { PostService } from '../post/postService'
-import { AuthService } from '../auth/authService'
 import { SessionService } from '../sessions/sessionService'
 export class UserController {
   private userService: UserService
   private otbService: OTBService
   private postService: PostService
-  private authService : AuthService
   private sessionService : SessionService
   constructor(
     userService: UserService,
     otbService: OTBService,
     postService: PostService,
-    authService: AuthService,
     sessionService: SessionService,
   ) {
     this.userService = userService
     this.otbService = otbService
     this.postService = postService
-    this.authService = authService
     this.sessionService = sessionService
   }
 
@@ -130,13 +125,13 @@ export class UserController {
       if(!result.success){
         return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
       }
-      const decoded=await getUserIdByAuthorization(c);
+      const decoded = c.get('user') 
       const [r]= await this.sessionService.isEnabled(decoded.sessionId);
       if(!r)
       {
         throw new Error("Invalid Token");
       }
-      const user=await this.userService.findUserById(decoded.userId);
+      const user=await this.userService.findUserById(decoded.id);
       if(!user)
       {
         throw new Error("User not found");
@@ -148,11 +143,11 @@ export class UserController {
 
         const p=await encryptPassword(newPassword);
         await this.userService.updatePassword(p,decoded.userId);
-        await this.userService.updateAllSessions(user.id);
+        await this.sessionService.updateAllSessions(user.id);
         const id=generateUniqueId();
         const t=await generateJWT(user.id,id);
         const date= generateExpirationDate()
-        await this.authService.createSession({
+        await this.sessionService.createSession({
           id:id,
           userId: user.id,
           token: t,

@@ -52,16 +52,6 @@ export async function verifyJwtToken(token:string)
     return jwt.verify(token, secret);
 }
 
-export async function getUserIdByAuthorization(c:Context) {
-    const bearer = c.req.header('Authorization')
-    if (!bearer) {
-    const error = new Error('No autorizado')
-    return c.json(error)
-    }
-    const token = bearer.split(' ')[1]
-    const decoded:any = await verifyJwtToken(token);
-    return decoded;
-}
 export function generateUniqueId(): string {
   return randomUUID();
 }
