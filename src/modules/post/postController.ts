@@ -60,23 +60,10 @@ export class PostController{
                 return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
             }
             const {content}=result.data;
-            const up : any=await this.postService.putPostById(id,content,decoded.id);
-            if(Array.isArray(up))
-            {
-                return c.json({
-                    post: up,
-                });
-            }else
-            {
-                if(up.severity )
-                {
-                    return c.json("No se encontro el post",404)
-                }
-                throw new Error(up)
-            }
-            
+            const up =await this.postService.putPostById(id,content,decoded.id);
+            return c.json(up)          
         }
-        catch(error:any)
+        catch(error: any)
         {
             return c.json({ error: error.message }, 401);
         }
