@@ -1,8 +1,6 @@
 import { eq } from 'drizzle-orm'
 import db from '../../db/db.client'
 import { users } from '../../db/schema/users'
-import { otb } from '../../db/schema/otb'
-import { sessions } from '../../db/schema/sessions'
 
 export class UserService {
   private dbClient
@@ -39,8 +37,4 @@ export class UserService {
   {
     return this.dbClient.update(users).set({password}).where(eq(users.id,userId));
   }
-  async updateAllSessions(userId:string)
-  {
-    return this.dbClient.update(sessions).set({isEnabled:false}).where(eq(sessions.userId,userId));
-  }
 }

@@ -2,7 +2,6 @@ import { Context } from "hono";
 import { PostService } from "./postService";
 import { postSchema, updatePostSchema } from "./dto/post.dto";
 import { UserService } from "../user/userService";
-import { getUserIdByAuthorization, verifyJwtToken } from "../auth/utils/authUtils";
 
 
 export class PostController{
@@ -19,19 +18,20 @@ export class PostController{
     createNewPost = async (c: Context) => {
         try{
             const body=await c.req.json();
-            const decoded=await getUserIdByAuthorization(c);
+            const decoded= c.get('user');
+            console.log(decoded)
             const result=postSchema.safeParse(body);
             if (!result.success) {
                 return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
             }
             const{title, content}=result.data;
-            const u=await this.userService.findUserById(decoded.userId);
+            const u=await this.userService.findUserById(decoded.id);
             if(!u)
             {
                 throw(new Error("User not found"));
             }
             const [insertedPost]=await this.postService.createPost({
-                userId:decoded.userId,
+                userId:decoded.id,
                 title,
                 content
             });
@@ -48,7 +48,7 @@ export class PostController{
     updatePost = async(c:Context) =>{
         try
         {
-            const decoded=await getUserIdByAuthorization(c);
+            const decoded= c.get('user');
             const id=c.req.param("id");
             if(!id)
             {
@@ -60,18 +60,24 @@ export class PostController{
                 return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
             }
             const {content}=result.data;
-            const up=await this.postService.putPostById(id,content,decoded.userId);
-            if(up!="Error el post no se encontro")
+            const up : any=await this.postService.putPostById(id,content,decoded.id);
+            if(Array.isArray(up))
             {
-                return c.json("Contenido actualizado!")
+                return c.json({
+                    post: up,
+                });
+            }else
+            {
+                if(up.severity )
+                {
+                    return c.json("No se encontro el post",404)
+                }
+                throw new Error(up)
             }
-            throw new Error("Error el post no pertenece al usuario")
-            
             
         }
         catch(error:any)
         {
-            console.error(error);
             return c.json({ error: error.message }, 401);
         }
     }

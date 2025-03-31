@@ -1,14 +1,16 @@
 import { Context } from 'hono';
-import { setCookie, deleteCookie, getCookie } from 'hono/cookie';
 import { loginSchema } from './dto/auth.dto';
 import { AuthService } from './authService';
-import { generateJWT, generateUniqueId, getUserIdByAuthorization, verifyJwtToken } from './utils/authUtils';
+import { generateJWT, generateUniqueId } from './utils/authUtils';
+import { SessionService } from '../sessions/sessionService';
 
 export class AuthController {
   private authService: AuthService;
+  private sessionService: SessionService;
 
-  constructor(authService: AuthService) {
+  constructor(authService: AuthService, sessionService: SessionService) {
     this.authService = authService;
+    this.sessionService = sessionService;
   }
 
   login = async (c: Context) => {
@@ -37,7 +39,7 @@ export class AuthController {
 
       const formattedDate = `${year}-${month}-${day}`; 
 
-      const sesion=await this.authService.createSession({
+      const sesion=await this.sessionService.createSession({
         id:idSession,
         userId:user.id,
         token: token,
@@ -54,12 +56,12 @@ export class AuthController {
 
   logout = async (c: Context) => {
     try {
-      const decoded=await getUserIdByAuthorization(c);
+      const decoded= c.get('user')
       if(!decoded)
       {
          throw new Error("no se encontro el token")
       }
-      const s=await this.authService.updateSessionById(decoded.sessionId);
+      const s=await this.sessionService.updateSessionById(decoded.sessionId);
       if(s==="Sesion no valida")
       {
         throw new Error(s);
@@ -72,8 +74,8 @@ export class AuthController {
 
   profile = async (c: Context) => {
     try {
-      const decoded = await getUserIdByAuthorization(c);
-      const profile = await this.authService.getUserProfile(decoded.userId);
+      const decoded = c.get('user')
+      const profile = await this.authService.getUserProfile(decoded.id);
       return c.json({ profile });
     } catch (error: any) {
       return c.json({ error: 'Invalid token or error retrieving profile' }, 400);

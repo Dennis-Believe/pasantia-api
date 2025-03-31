@@ -5,7 +5,6 @@ import { OTBService } from '../otb/otbService';
 import { authenticate } from '../../middlewares/auth';
 import { PostService } from '../post/postService';
 import { SessionService } from '../sessions/sessionService';
-import { AuthService } from '../auth/authService';
 
 export const userRoutes = new Hono();
 
@@ -14,9 +13,8 @@ const userService = new UserService();
 const otbService = new OTBService();
 const postService = new PostService();
 const sessionService = new SessionService();
-const authService = new AuthService();
 
-const userController = new UserController(userService,otbService,postService,authService,sessionService);
+const userController = new UserController(userService,otbService,postService,sessionService);
 
 // Definir las rutas
 userRoutes.post('/create-account', userController.createAccount);

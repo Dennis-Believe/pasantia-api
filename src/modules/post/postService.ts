@@ -23,20 +23,26 @@ export class PostService {
     }
     async putPostById(id:string,content:string,userId:string)
     {
-      const post=await this.dbClient.query.posts.findFirst({
-            where: eq(posts.id, id),
-          })
-      if(post && post.userId===userId)
-      {
-        const newPost=this.dbClient.update(posts).set({
-          content
-        }).where(eq(posts.id,id)).returning();
-        return newPost;
+      try {
+            const post=await this.dbClient.query.posts.findFirst({
+              where: eq(posts.id, id),
+            })
+            if( post?.isDeleted === true){
+              throw new Error("El post fue eliminado");
+            }
+            if(post && post.userId===userId)
+            {
+              const newPost=this.dbClient.update(posts).set({
+                content
+              }).where(eq(posts.id,id)).returning();
+              return newPost;
+            }
+            else
+            {
+              throw new Error("No tienes permiso para editar este post");
+            }
+      } catch (error) {
+        return error;
       }
-      else
-      {
-        return "Error el post no se encontro";
-      }
-      
     }
 }

@@ -1,7 +1,4 @@
 import { eq } from 'drizzle-orm';
-import crypto from 'crypto';
-import { env } from '../../config/env';
-import { transporter } from '../auth/utils/authUtils';
 import db from '../../db/db.client';
 import { users } from '../../db/schema/users';
 import { otb } from '../../db/schema/otb';
