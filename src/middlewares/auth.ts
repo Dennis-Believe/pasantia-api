@@ -1,15 +1,14 @@
 import { Context, Next } from 'hono'
 import { verifyJwtToken } from '../modules/auth/utils/authUtils'
 import { SessionService } from '../modules/sessions/sessionService'
-import { boolean } from 'drizzle-orm/gel-core';
+import { HTTPException } from 'hono/http-exception'
 
 export const authenticate = async (c: Context, next: Next) => {
   const sessionService = new SessionService();
   try {
     const bearer = c.req.header('Authorization')
     if (!bearer) {
-      const error = new Error('No autorizado')
-      return c.json(error)
+          throw new HTTPException(401, { message: 'No autorizado' })
     }
     const token = bearer.split(' ')[1]
 
@@ -19,17 +18,20 @@ export const authenticate = async (c: Context, next: Next) => {
         const [result] = await sessionService.isEnabled(decoded.sessionId)
         const enabled = result.isEnabled;
         if(!enabled){
-          return c.json({ error: 'Token no valido' })
+          throw new HTTPException(401, { message: 'Token no válido' })
         }
         c.set('user', { id: decoded.userId , sessionId: decoded.sessionId})
         await next()
       } else {
-        return c.json({ error: 'Token no valido' })
+        throw new HTTPException(401, { message: 'Token no válido' })
       }
     } catch (error) {
-      return c.json('Token no válido')
+      throw new HTTPException(401, { message: 'Token no válido' })
     }
   } catch (error) {
-    return c.json('Hubo un error en la autenticación')
+    if(error instanceof HTTPException) {
+      throw error
+    }
+    throw new HTTPException(401, { message: 'Error de autenticación' });
   }
 }

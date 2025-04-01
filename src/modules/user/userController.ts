@@ -1,6 +1,7 @@
 import { Context } from 'hono'
+import { HTTPException } from 'hono/http-exception';
 import { UserService } from './userService'
-import { passwordSchema, postPaginationSchema, updateUserProfileSchema, userSchema } from './dto/user.dto'
+import { passwordSchema, updateUserProfileSchema, userSchema } from './dto/user.dto'
 import {
   decryptPassword,
   encryptPassword,
@@ -11,22 +12,18 @@ import {
   sendEmail,
 } from '../auth/utils/authUtils'
 import { OTBService } from '../otb/otbService'
-import { PostService } from '../post/postService'
 import { SessionService } from '../sessions/sessionService'
 export class UserController {
   private userService: UserService
   private otbService: OTBService
-  private postService: PostService
   private sessionService : SessionService
   constructor(
     userService: UserService,
     otbService: OTBService,
-    postService: PostService,
     sessionService: SessionService,
   ) {
     this.userService = userService
     this.otbService = otbService
-    this.postService = postService
     this.sessionService = sessionService
   }
 
@@ -37,7 +34,7 @@ export class UserController {
       // Validación
       const result = userSchema.safeParse(body)
       if (!result.success) {
-        return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
+        return c.json({ message: 'Datos inválidos', errors: result.error.formErrors.fieldErrors }, 400);
       }
 
       const { firstName, lastName, email, password, birthDate } = result.data
@@ -45,7 +42,7 @@ export class UserController {
       // Prevenir duplicados
       const userExist = await this.userService.findUserByEmail(email)
       if (userExist) {
-        return c.json('El usuario ya existe!', 400)
+        throw new HTTPException(409, { message: 'El usuario ya existe!' });
       }
 
       // Encriptar contraseña y formatear fecha
@@ -69,24 +66,10 @@ export class UserController {
 
       return c.json('Creado correctamente, verifique su email')
     } catch (error) {
-      console.error(error)
-      return c.json('Hubo un error', 500)
-    }
-  }
-  getPosts = async (c: Context) => {
-    try {
-      const { id } = c.get('user')
-      const body = await c.req.json()
-      const result = postPaginationSchema.safeParse(body)
-      if(!result.success){
-        return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
+      if (error instanceof HTTPException) {
+        throw error
       }
-      const { page, pageSize } = result.data
-
-      const posts = await this.postService.getPostsById(id,page,pageSize);
-      return c.json(posts)
-    } catch (error) {
-      return c.json('Hubo un errorr', 500)
+      throw new HTTPException(500, { message: 'Hubo un error al crear el usuario' });
     }
   }
   updateUser = async (c:Context) =>{
@@ -97,14 +80,14 @@ export class UserController {
       // Validación
       const result = updateUserProfileSchema.safeParse(body)
       if (!result.success) {
-        return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
+        return c.json({ message: 'Datos inválidos', errors: result.error.formErrors.fieldErrors }, 400);
       }
       const filteredUpdates : any = Object.entries(result.data).reduce(
         (acc, [key, value])=> (value !== undefined ? { ...acc, [key] : value } : acc),
         {}
       )
       if(Object.keys(filteredUpdates).length ===0){
-        return c.json({error: 'No se enviaron datos validos para actualizar'}, 400)
+        throw new HTTPException(400, { message: 'No se enviaron datos válidos para actualizar' });
       }
       if(filteredUpdates.birthDate){
         formattedBirthDate = filteredUpdates.birthDate.toISOString().split('T')[0]
@@ -114,7 +97,10 @@ export class UserController {
 
       return c.json('Usuario actualizado correctamente')
     } catch (error) {
-      return c.json('Hubo un error')
+      if (error instanceof HTTPException) {
+        throw error
+      }
+      throw new HTTPException(500, { message: 'Hubo un error al actualizar el usuario' });
     }
   }
   changePassword = async (c:Context) =>{
@@ -122,19 +108,19 @@ export class UserController {
     {
       const body = await c.req.json();
       const result = passwordSchema.safeParse(body);
-      if(!result.success){
-        return c.json({ errors: result.error.formErrors.fieldErrors }, 400)
+      if (!result.success) {
+        return c.json({ message: 'Datos inválidos', errors: result.error.formErrors.fieldErrors }, 400);
       }
       const decoded = c.get('user') 
       const [r]= await this.sessionService.isEnabled(decoded.sessionId);
       if(!r)
       {
-        throw new Error("Invalid Token");
+        throw new HTTPException(401, { message: 'Token inválido' });
       }
       const user=await this.userService.findUserById(decoded.id);
       if(!user)
       {
-        throw new Error("User not found");
+        throw new HTTPException(404, { message: 'Usuario no encontrado' });
       }
       const {password, newPassword}=result.data;
       const pDecode=await decryptPassword(user?.password);
@@ -142,7 +128,7 @@ export class UserController {
       {
 
         const p=await encryptPassword(newPassword);
-        await this.userService.updatePassword(p,decoded.userId);
+        await this.userService.updatePassword(p,decoded.id);
         await this.sessionService.updateAllSessions(user.id);
         const id=generateUniqueId();
         const t=await generateJWT(user.id,id);
@@ -156,12 +142,14 @@ export class UserController {
         })
         return c.json({message:"Password Updated!", token:`Bearer ${t}`},200);
       }
-      throw new Error("Invalid Credentials")
+      throw new HTTPException(401, { message: 'Credenciales inválidas' });
     }
     catch(error:any)
     {
-      console.error(error);
-      return c.json({ error: error.message }, 401);
-    }
-  }
+      if (error instanceof HTTPException) {
+        throw error
+      }
+      throw new HTTPException(500, { message: error.message });
+    }
+  }
 }
