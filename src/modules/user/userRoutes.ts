@@ -14,10 +14,9 @@ const otbService = new OTBService();
 const postService = new PostService();
 const sessionService = new SessionService();
 
-const userController = new UserController(userService,otbService,postService,sessionService);
+const userController = new UserController(userService,otbService,sessionService);
 
 // Definir las rutas
 userRoutes.post('/create-account', userController.createAccount);
-userRoutes.post('/posts',authenticate,userController.getPosts);
 userRoutes.patch('/edit',authenticate, userController.updateUser);
 userRoutes.patch('/pass',authenticate, userController.changePassword);
